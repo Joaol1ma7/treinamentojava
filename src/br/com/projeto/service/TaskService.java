@@ -10,11 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
-import java.io.PrintWriter;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.File;
+
 
 public class TaskService {
     public static List<Task> listaDeTarefas = new ArrayList<>();
@@ -88,12 +84,7 @@ public class TaskService {
     public static boolean verifyTaskType(long id){
         for (Task t: TaskService.listaDeTarefas){
             if(t.getId()==id){
-                if(t instanceof RecurringTask){
-                    return true;
-                    //vdd se for instancia de recurring falso se for instancia de onetimetask
-                }else{
-                    return false;
-                }
+                return t instanceof RecurringTask;
             }
         }
         return false;
@@ -130,9 +121,9 @@ public class TaskService {
     public static void sortTasks(String condition){
         List<Task> listaOrdenada = new ArrayList<>(listaDeTarefas);
         if(condition.equals("D")){
-            listaOrdenada.sort(Comparator.comparing(task -> task.getDueDate()));
+            listaOrdenada.sort(Comparator.comparing(Task::getDueDate));
         }else if(condition.equals("P")){
-            listaOrdenada.sort(Comparator.comparing(task -> task.getPriority()));
+            listaOrdenada.sort(Comparator.comparing(Task::getPriority));
         }
         for(Task t:listaOrdenada){
             t.show();
