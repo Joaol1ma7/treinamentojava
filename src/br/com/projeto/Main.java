@@ -1,4 +1,10 @@
+package br.com.projeto;
+
+import br.com.projeto.repository.TaskRepository;
+import br.com.projeto.service.TaskService;
+
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Main {
@@ -19,14 +25,22 @@ public class Main {
                         } else {
                             break;
                         }
-                    } catch (java.time.format.DateTimeParseException e) {
+                    } catch (DateTimeParseException e) {
                         System.out.println("Formato inválido.Digite no formato demonstrado.");
                     }
                 }
                 System.out.println("Digite a prioridade da tarefa:(A,M,B)");
                 String prio =sc.nextLine().toUpperCase();
+                while(!prio.equals("A") && !prio.equals("M") && !prio.equals("B")){
+                    System.out.println("Digite apenas A, M ou B");
+                    prio =sc.nextLine().toUpperCase();
+                }
                 System.out.println("Essa tarefa será recorrente? Digite 'S'(Sim) ou 'N'(Não)");
                 String cond=sc.nextLine().toUpperCase();
+                while(!cond.equals("N") && !cond.equals("S")){
+                    System.out.println("Digite apenas 'S' ou 'N'");
+                    cond=sc.nextLine().toUpperCase();
+                }
                 if(cond.equals("S")){
                     int rec;
                     while(true){
@@ -39,14 +53,14 @@ public class Main {
                             System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
                         }
                     }
-                    TaskManager.addTask(title,description,dueDate,prio,rec);
+                    TaskService.addTask(title,description,dueDate,prio,rec);
                 }else if(cond.equals("N")){
-                    TaskManager.addTask(title,description,dueDate,prio,0);
+                    TaskService.addTask(title,description,dueDate,prio,0);
                 }
 
     }
     public static void list(){
-                if (TaskManager.listaDeTarefas.isEmpty()){
+                if (TaskService.listaDeTarefas.isEmpty()){
                     System.out.println("Não há nenhuma tarefa para ser listada.");
                 }else {
                     System.out.println("Você deseja filtrar por DONE ou TO_DO?'D', 'T' ou 'N'");
@@ -56,20 +70,20 @@ public class Main {
                         f=sc.nextLine().toUpperCase();
                     }
                     if (f.equals("D")){
-                        TaskManager.listTasks(1);
+                        TaskService.listTasks(1);
                     }else if(f.equals("T")){
-                        TaskManager.listTasks(2);
+                        TaskService.listTasks(2);
                     }else{
-                        TaskManager.listTasks(0);
+                        TaskService.listTasks(0);
                     }
                 }
 
     }
     public static void done(){
-                if (TaskManager.listaDeTarefas.isEmpty()){
+                if (TaskService.listaDeTarefas.isEmpty()){
                     System.out.println("Não há nenhuma tarefa para ser finalizada.");
                 }else {
-                    TaskManager.listTasks(0);
+                    TaskService.listTasks(0);
                     long id;
                     while(true){
                         try{
@@ -82,15 +96,15 @@ public class Main {
                         }
                     }
                     id = getId(id);
-                    TaskManager.finishTask(id);
+                    TaskService.finishTask(id);
                 }
 
     }
     public static void delete(){
-                if (TaskManager.listaDeTarefas.isEmpty()){
+                if (TaskService.listaDeTarefas.isEmpty()){
                     System.out.println("Não há nenhuma tarefa para ser removida.");
                 }else{
-                    TaskManager.listTasks(0);
+                    TaskService.listTasks(0);
                     long id;
                     while(true){
                         try{
@@ -104,12 +118,12 @@ public class Main {
                     }
                     id = getId(id);
 
-                    TaskManager.deleteTask(id);
+                    TaskService.deleteTask(id);
                 }
     }
 
     private static long getId(long id) {//MÉTODO Q O INTELLIJ CRIOU PRA TIRAR REPETIÇÃO DO CODIGO
-        while(!TaskManager.verifyTaskInList(id)){
+        while(!TaskService.verifyTaskInList(id)){
             while(true){
                 try{
                     System.out.println("Digite um ID de task válido:");
@@ -125,10 +139,10 @@ public class Main {
     }
 
     public static void update(){
-                if (TaskManager.listaDeTarefas.isEmpty()){
+                if (TaskService.listaDeTarefas.isEmpty()){
                     System.out.println("Não há nenhuma tarefa para ser atualizada.");
                 }else {
-                    TaskManager.listTasks(0);
+                    TaskService.listTasks(0);
                     long id;
                     while(true){
                         try{
@@ -156,19 +170,23 @@ public class Main {
                             } else {
                                 break;
                             }
-                        } catch (java.time.format.DateTimeParseException e) {
+                        } catch (DateTimeParseException e) {
                             System.out.println("Formato inválido.Digite no formato demonstrado.");
                         }
                     }
                     System.out.println("Digite a nova prioridade da tarefa:(A,M,B)");
                     String prio =sc.nextLine().toUpperCase();
+                    while(!prio.equals("A") && !prio.equals("M") && !prio.equals("B")){
+                        System.out.println("Digite apenas A, M ou B.");
+                        prio=sc.nextLine().toUpperCase();
+                    }
                     System.out.println("Escreva o novo estado da tarefa:'T' ou 'D'.");
                     String status=sc.nextLine().toUpperCase();
                     while(!status.equals("T") && !status.equals("D")){
                         System.out.println("Digite apenas 'T' ou 'D':");
                         status=sc.nextLine().toUpperCase();
                     }
-                    if(TaskManager.verifyTaskType(id)){
+                    if(TaskService.verifyTaskType(id)){
                         int rec;
                         while(true){
                             try{
@@ -180,14 +198,14 @@ public class Main {
                                 System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
                             }
                         }
-                        TaskManager.updateTask(id,title,description,dueDate,prio,rec,status);
+                        TaskService.updateTask(id,title,description,dueDate,prio,rec,status);
                     }else{
-                        TaskManager.updateTask(id,title,description,dueDate,prio,0,status);
+                        TaskService.updateTask(id,title,description,dueDate,prio,0,status);
                     }
                 }
     }
     public static void sort(){
-                if (TaskManager.listaDeTarefas.isEmpty()){
+                if (TaskService.listaDeTarefas.isEmpty()){
                     System.out.println("Não há nenhuma tarefa para ser ordenada.");
                 }else {
                     System.out.println("Você deseja ordenar por data ou prioridade? 'D' ou 'P'");
@@ -196,12 +214,12 @@ public class Main {
                         System.out.println("Digite apenas 'D' ou 'P':");
                         condition=sc.nextLine().toUpperCase();
                     }
-                    TaskManager.sortTasks(condition);
+                    TaskService.sortTasks(condition);
                 }
     }
     public static void main(String[] args) {
         System.out.println("Seja bem-vindo ao Task Manager!");
-        TaskManager.loadTasks();
+        TaskRepository.loadTasks();
         label:
         while(true){
             System.out.println("Digite uma das opções para realizar uma ação:");
@@ -228,7 +246,7 @@ public class Main {
                     Main.delete();
                     break;
                 case "QUIT":
-                    TaskManager.saveTasks();
+                    TaskRepository.saveTasks();
                     break label;
             }
         }
