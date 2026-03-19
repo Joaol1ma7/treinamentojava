@@ -1,7 +1,11 @@
 package br.com.projeto;
 
+import br.com.projeto.exception.InputValidationException;
+import br.com.projeto.exception.InvalidDateException;
+import br.com.projeto.exception.InvalidNumberException;
 import br.com.projeto.repository.TaskRepository;
 import br.com.projeto.service.TaskService;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -9,6 +13,29 @@ import java.util.Scanner;
 
 public class Main {
     public static Scanner sc=new Scanner(System.in);
+    private static long lerNumeroLong() {
+        try {
+            return Long.parseLong(sc.nextLine());
+        } catch (NumberFormatException e) {
+            throw new InvalidNumberException(); // Lança a sua exceção!
+        }
+    }
+
+    private static int lerNumeroInt() {
+        try {
+            return Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            throw new InvalidNumberException(); // Lança a sua exceção!
+        }
+    }
+
+    private static LocalDate lerData() {
+        try {
+            return LocalDate.parse(sc.nextLine());
+        } catch (DateTimeParseException e) {
+            throw new InvalidDateException(); // Lança a sua exceção!
+        }
+    }
     public static void add(){
                 System.out.println("Digite o título da tarefa:");
                 String title=sc.nextLine();
@@ -17,16 +44,15 @@ public class Main {
                 LocalDate dueDate;
                 while (true) {
                     System.out.println("Digite a data de vencimento da tarefa (AAAA-MM-DD):");
-                    String data = sc.nextLine();
                     try {
-                        dueDate = LocalDate.parse(data);
+                        dueDate=lerData();
                         if (dueDate.isBefore(LocalDate.now())) {
                         System.out.println("Data inválida. São permitidas apenas datas posteriores à hoje.");
                         } else {
                             break;
                         }
-                    } catch (DateTimeParseException e) {
-                        System.out.println("Formato inválido.Digite no formato demonstrado.");
+                    } catch (InputValidationException e) {
+                        System.out.println(e.getMessage());
                     }
                 }
                 System.out.println("Digite a prioridade da tarefa:(A,M,B)");
@@ -46,11 +72,10 @@ public class Main {
                     while(true){
                         try{
                             System.out.println("Digite o número de dias para ela ficar disponível novamente.");
-                            String recStr=sc.nextLine();
-                            rec=Integer.parseInt(recStr);
+                            rec=lerNumeroInt();
                             break;
-                        }catch(NumberFormatException e){
-                            System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
+                        }catch(InputValidationException e){
+                            System.out.println(e.getMessage());
                         }
                     }
                     TaskService.addTask(title,description,dueDate,prio,rec);
@@ -88,11 +113,10 @@ public class Main {
                     while(true){
                         try{
                             System.out.println("Digite o ID da task que você deseja finalizar:");
-                            String idStr=sc.nextLine();
-                            id=Long.parseLong(idStr);
+                            id=lerNumeroLong();
                             break;
-                        }catch(NumberFormatException e){
-                            System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
+                        }catch(InputValidationException e){
+                            System.out.println(e.getMessage());
                         }
                     }
                     id = getId(id);
@@ -109,11 +133,10 @@ public class Main {
                     while(true){
                         try{
                             System.out.println("Digite o ID da task que você deseja excluir:");
-                            String idStr=sc.nextLine();
-                            id=Long.parseLong(idStr);
+                            id=lerNumeroLong();
                             break;
-                        }catch(NumberFormatException e){
-                            System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
+                        }catch(InputValidationException e){
+                            System.out.println(e.getMessage());
                         }
                     }
                     id = getId(id);
@@ -121,23 +144,20 @@ public class Main {
                     TaskService.deleteTask(id);
                 }
     }
-
     private static long getId(long id) {//MÉTODO Q O INTELLIJ CRIOU PRA TIRAR REPETIÇÃO DO CODIGO
         while(!TaskService.verifyTaskInList(id)){
             while(true){
                 try{
                     System.out.println("Digite um ID de task válido:");
-                    String idStr=sc.nextLine();
-                    id=Long.parseLong(idStr);
+                    id=lerNumeroLong();
                     break;
-                }catch(NumberFormatException e){
-                    System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
+                }catch(InputValidationException e){
+                    System.out.println(e.getMessage());
                 }
             }
         }
         return id;
     }
-
     public static void update(){
                 if (TaskService.listaDeTarefas.isEmpty()){
                     System.out.println("Não há nenhuma tarefa para ser atualizada.");
@@ -147,11 +167,10 @@ public class Main {
                     while(true){
                         try{
                             System.out.println("Digite o ID da task que você deseja atualizar:");
-                            String idStr=sc.nextLine();
-                            id=Long.parseLong(idStr);
+                            id=lerNumeroLong();
                             break;
-                        }catch(NumberFormatException e){
-                            System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
+                        }catch(InputValidationException e){
+                            System.out.println(e.getMessage());
                         }
                     }
                     id=getId(id);
@@ -162,16 +181,15 @@ public class Main {
                     LocalDate dueDate;
                     while (true) {
                         System.out.println("Digite a data de vencimento da tarefa (AAAA-MM-DD):");
-                        String data = sc.nextLine();
                         try {
-                            dueDate = LocalDate.parse(data);
+                            dueDate =lerData();
                             if (dueDate.isBefore(LocalDate.now())) {
                                 System.out.println("Data inválida. São permitidas apenas datas posteriores à hoje.");
                             } else {
                                 break;
                             }
-                        } catch (DateTimeParseException e) {
-                            System.out.println("Formato inválido.Digite no formato demonstrado.");
+                        } catch (InputValidationException e) {
+                            System.out.println(e.getMessage());
                         }
                     }
                     System.out.println("Digite a nova prioridade da tarefa:(A,M,B)");
@@ -191,11 +209,10 @@ public class Main {
                         while(true){
                             try{
                                 System.out.println("Digite o número de dias para ela ficar disponível novamente.");
-                                String recStr=sc.nextLine();
-                                rec=Integer.parseInt(recStr);
+                                rec=lerNumeroInt();
                                 break;
-                            }catch(NumberFormatException e){
-                                System.out.println("Você digitou uma letra ou símbolo. Apenas números são permitidos.");
+                            }catch(InputValidationException e){
+                                System.out.println(e.getMessage());
                             }
                         }
                         TaskService.updateTask(id,title,description,dueDate,prio,rec,status);

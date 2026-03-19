@@ -1,5 +1,6 @@
 package br.com.projeto.repository;
 
+import br.com.projeto.exception.FileOperationException;
 import br.com.projeto.model.OneTimeTask;
 import br.com.projeto.model.RecurringTask;
 import br.com.projeto.model.Task;
@@ -25,8 +26,8 @@ public class TaskRepository {
                 }
             }
             System.out.println("Arquivo tasks.csv salvo!");
-        } catch (IOException e) {
-            System.out.println("Erro ao salvar o arquivo. " + e.getMessage());
+        }  catch (IOException e) {
+            throw new FileOperationException(e.getMessage());
         }
     }
     public static void loadTasks() {
@@ -54,8 +55,8 @@ public class TaskRepository {
                 }
             }
             System.out.println("Tarefas carregadas com sucesso!");
-        } catch (Exception e) {
-            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+        } catch (IOException e) {
+            throw new FileOperationException(e.getMessage());
         }
     }
 }
